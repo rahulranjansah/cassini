@@ -52,6 +52,7 @@ Example plot snippet from `calibration.ipynb`:
 
 ![Calibration function for Srama's CAT mass analyser](img/srama_mass.png)
 ![Calibration function for Srama's IID velocity analyser](img/srama_vel.png)
+![ML driven calibration function for Srama's IID velocity](img/val_ml_cali.png)
 
 ## Future work
 - A potential expansion of this project involves using the benchmark set in the referenced paper as a baseline and then applying state-of-the-art machine learning models to derive improved equations that better fit the calibration curves. This approach aims to enhance the accuracy and reliability of the calibration functions by leveraging advanced data-driven techniques.
