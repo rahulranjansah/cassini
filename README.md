@@ -5,9 +5,8 @@ This project reproduces the calibration functions of Cassini's Cosmic Dust Analy
 ## Project Structure
 
 - `eda.ipynb`: Exploratory Data Analysis
-- `calibration.ipynb`: Main Jupyter notebook containing the implementation of the calibration functions and visualization of the results.
 - `scripts/`: Directory containing additional scripts and functions used in the project.
-
+- `docs/`: Directory containing docs for HDFS and Cloud data management
 ## Installation
 
 1. Clone the repository:
@@ -25,13 +24,19 @@ This project reproduces the calibration functions of Cassini's Cosmic Dust Analy
 3. Install the required dependencies:
     ```sh
     pip install -r requirements.txt
+
     ```
+4. Documentation
+- [HDFS Setup and Usage](docs/HDFS.md)
+- [AWS Setup and Usage](docs/AWS.md)
 
 ## Usage
 
 1. Open the Jupyter notebook:
     ```sh
-    jupyter notebook calibration.ipynb
+    jupyter notebook scripts/calibration.ipynb
+    jupyter notebook scripts/ml_calibration.ipynb
+    jupyter notebook scripts/mass_calibration.ipynb
     ```
 
 2. Run the cells in the notebook to reproduce the calibration functions and visualize the results.
@@ -48,7 +53,7 @@ The main calibration functions implemented in this project are:
 
 The notebook includes visualizations of the calibration results using Matplotlib. The plots show the relationship between PSU velocity and mass, including error margins.
 
-Example plot snippet from `calibration.ipynb`:
+Example plot snippets:
 
 ![Calibration function for Srama's CAT mass analyser](img/srama_mass.png)
 ![Calibration function for Srama's IID velocity analyser](img/srama_vel.png)
