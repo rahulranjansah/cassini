@@ -33,7 +33,7 @@ cal_df = pd.read_pickle("data/level1/CDA__CAT_IID_cal_data.pkl")
 
 # Create a dropdown menu for target selector in the sidebar
 tar_list = cal_df.TAR.unique()
-tar_selection = st.sidebar.multiselect("Select target", tar_list)
+tar_selection = st.sidebar.multiselect("Select target", tar_list, ["CAT"])
 
 tar_filter = cal_df[cal_df.TAR.isin(tar_selection)]
 with st.expander("Filtered by target"):
