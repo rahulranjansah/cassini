@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
 
+import plotly.graph_objects as go
+
 # matplotlib dark mode
 plt.style.use('dark_background')
 
@@ -289,6 +291,112 @@ if st.sidebar.button("Split Data"):
                 {y_scaler.inverse_transform([[rmse_scaled]])[0][0]}")
         st.write(f"Test MAE: {mae_scaled:.4f} \
                 & MAE on target variable: {y_scaler.inverse_transform([[mae_scaled]])[0][0]}")
+
+        # Rescale the data to fit the 3D mesh for a hyperplane
+        st.sidebar.subheader("3D Mesh Grid Configuration")
+
+        # Define default min and max ranges based on selected features
+        default_min_values = [1, 0.5]
+        default_max_values = [60, 2.6]
+
+        # Allow users to dynamically adjust the range for mesh grid scaling
+        min_values = []
+        max_values = []
+
+        if len(selected_features) == 2:
+            for i, feature in enumerate(selected_features):
+                min_val = st.sidebar.number_input(f"Min value for {feature}", value=default_min_values[i])
+                max_val = st.sidebar.number_input(f"Max value for {feature}", value=default_max_values[i])
+                min_values.append(min_val)
+                max_values.append(max_val)
+
+            # Transform min and max values using the scaler
+            min_scaled = X_scaler.transform([min_values])[0]
+            max_scaled = X_scaler.transform([max_values])[0]
+
+            # Generate linspaced values in between to fit the grid
+            scaled_ranges = [np.linspace(min_scaled[i], max_scaled[i], 100) for i in range(len(selected_features))]
+
+            # Create meshgrid for the selected features
+            meshgrid_scaled = np.meshgrid(*scaled_ranges)
+
+
+            # plotting the z-axis with the help of meshgrid
+            feature_one = []
+            feature_two = []
+            pred_val = []
+
+            for _f1, _f2 in zip(*meshgrid_scaled):
+                stacked_scaled = np.hstack([_f1.reshape(-1,1),
+                                            _f2.reshape(-1,1)])
+
+                # rise time and log_fc scalings
+                feature_one.append(X_scaler.inverse_transform(stacked_scaled)[:, 0])
+                feature_two.append(X_scaler.inverse_transform(stacked_scaled)[:,1])
+
+                # pred. vel. stacked scaling
+                temp_results = model.predict(x=stacked_scaled)
+                pred_val.append(y_scaler.inverse_transform(temp_results.reshape(1,-1))[0])
+
+            pred_val = np.array(pred_val)
+
+            print(feature_one)
+            print("a")
+            print(feature_two)
+            print("a")
+            print(pred_val)
+
+            # # 3D plot
+
+            x_feature, y_feature = selected_features
+            tar_filter = tar_filter[tar_filter[x_feature] >= 0.0]
+            tar_filter = tar_filter[tar_filter[y_feature] >= 0.0]
+
+            # Create 3D scatter plot with Plotly
+            fig = go.Figure()
+
+            # Scatter plot
+            fig.add_trace(
+                go.Scatter3d(
+                    x=tar_filter[x_feature],
+                    y=np.log10(tar_filter[y_feature]),
+                    z=tar_filter[selected_target],
+                    mode="markers",
+                    marker=dict(
+                        size=5,
+                        color=tar_filter[selected_target],
+                        colorscale="Viridis",
+                        opacity=0.8,
+                    ),
+                    name="Scatter Points",
+                )
+            )
+
+            # Regression surface
+            fig.add_trace(
+                go.Surface(
+                    x=np.array(feature_one),
+                    y=np.array(np.log10(feature_two)),
+                    z=pred_val,
+                    colorscale="Viridis",
+                    opacity=0.7,
+                    name="Regression Surface",
+                )
+            )
+
+            # Customize layout
+            fig.update_layout(
+                scene=dict(
+                    xaxis_title=f"{x_feature}",
+                    yaxis_title=f"{y_feature}",
+                    zaxis_title=f"{selected_target}",
+                ),
+                title=f"3D Scatter Plot and Regression Surface for ",
+                margin=dict(l=0, r=0, t=30, b=0),
+            )
+
+            # Display interactive plot in Streamlit
+            st.plotly_chart(fig, use_container_width=True)
 
     else:
         st.sidebar.warning("Please select at least one feature and ensure the target variable is not among selected features.")
